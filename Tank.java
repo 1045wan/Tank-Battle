@@ -1,16 +1,27 @@
-package com.liuyonghong.tank;
+package cmo.lxr.tank;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 
 public class Tank {
+
 	private int x, y;
-	private Dir dir =Dir.DOWN;
-	private static final int SPEED =5;
+
+	private Dir dir = Dir.DOWN;
+	public Dir getDir() {
+		return dir;
+	}
+
+	public void setDir(Dir dir) {
+		this.dir = dir;
+	}
+
+	private static final int SPEED = 5;
 	
-	private boolean moving = false;
+	private boolean moving=false;
 	
-	private TankFrame tf = null;
+	private tankFrame tf = null;
 	
 	public boolean isMoving() {
 		return moving;
@@ -20,60 +31,51 @@ public class Tank {
 		this.moving = moving;
 	}
 
-	public Dir getDir() {
-		return dir;
-	}
+	private boolean living = true;
 
-	public void setDir(Dir dir) {
-		this.dir = dir;
-	}
-
-	
-	
-	public Tank(int x, int y, Dir dir,TankFrame tf) {
+	public Tank(int x, int y, Dir dir,tankFrame tf) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.dir = dir;
-		this.tf = tf;
+		this.tf=tf;
 	}
 
 	public void paint(Graphics g) {
-		// TODO Auto-generated method stub
-		Color c = g.getColor();
-		g.setColor(Color.BLUE);//主战坦克颜色设置
-		 g.fillRect(x, y, 50, 50);
-		 g.setColor(c);//设置老的颜色
-		 
-		 move();
-		 
-	}	 
-	
-	private void move() {
-		if(!moving) return;
+		g.drawImage(null, x, y, tf);
 		
-		 switch(dir) {
-		 case LEFT:
-			 x-=SPEED;
-			 break;
-		 case UP:
-			 y-=SPEED;
-			 break;
-		 case RIGHT:
-			 x+=SPEED;
-			 break;
-		 case DOWN:
-			 y+=SPEED;
-			 break;
-		 }	
+		
+		
+		
+		
+		move();
+		
+		
 	}
 
-	
+	private void move() {
+		if(!moving) return ;
+		switch (dir)
+
+		{
+		case LEFT:
+			x -= SPEED;
+			break;
+		case UP:
+			y -= SPEED;
+			break;
+		case RIGHT:
+			x += SPEED;
+			break;
+		case DOWN:
+			y += SPEED;
+			break;
+		}
+		
+	}
+
 	public void fire() {
-		// TODO Auto-generated method stub
-		tf.bullets.add ( new Bullet(this.x,this.y,this.dir,this.tf));
+		tf.bullets.add( new Bullet(this.x ,this.y, this.dir,this.tf));
+		
 	}
-	
-
-
 }
