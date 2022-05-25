@@ -1,6 +1,7 @@
 package com.liuyonghong.tank;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -9,19 +10,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import com.liuyonghong.tank.abstractfactory.BaseExplode;
+import com.liuyonghong.tank.abstractfactory.DefaultFactory;
+import com.liuyonghong.tank.abstractfactory.GameFactory;
+import com.liuyonghong.tank.abstractfactory.RectFactory;
 
 public class TankFrame extends Frame {
 	
+	GameModel gm = GameModel.getInstance();
 	
-
-	Tank myTank = new Tank(200,200,Dir.DOWN,this);
-	List<Bullet> bullets =new ArrayList<>();
-	static final int GAME_WIDTH = 800,GAME_HEIGHT = 600;
+	static final int GAME_WIDTH = 1080,GAME_HEIGHT = 960;
 	
     public TankFrame() {
-    setSize(800,600);
+    setSize(GAME_WIDTH,GAME_HEIGHT);
     setResizable(false);
     setTitle("tank war");
     setVisible(true);
@@ -38,6 +41,7 @@ public class TankFrame extends Frame {
   }
    //消除闪烁
     Image offScreenImage = null;
+
     @Override
     public void update(Graphics g) {
     	if(offScreenImage == null) {
@@ -55,24 +59,7 @@ public class TankFrame extends Frame {
     
     @Override
    public void paint(Graphics g) {
-    	Color c = g.getColor();
-    	g.setColor(Color.WHITE);
-    	g.drawString("子弹的数量:"+ bullets.size(),10,60);
-    	g.setColor(c);
-    //消除子弹列表的内存泄露，处理迭代器中的删除问题	
-    //方法一	
-    	myTank.paint(g);
-    	for(int i=0; i<bullets.size();i++) {
-    		bullets.get(i).paint(g);
-  	}
-	//方法二
-    //for(Iterator<Bullet>it = bullets.iterator();it.hasNext();) {
-	//	Bullet b = it.next();
-	//	if(!b.live)it.remove();	}
-    	
-    
-    	
-   }
+         gm.paint(g);
     
     //记录按键状态来控制坦克方向
     class  MykeyListener extends KeyAdapter{
@@ -99,16 +86,12 @@ public class TankFrame extends Frame {
             	bD = true;
 	            break;
 			
-            case KeyEvent.VK_CONTROL:
-            myTank.fire();    
-            break;
-            
-            
             
 				default:
 					break;
 			}
 		setMainTankDir();
+		 new Thread(()->new Audio("audio/tank_move.wav").play()).start();
 		}
 
 		@Override
@@ -127,10 +110,13 @@ public class TankFrame extends Frame {
             case KeyEvent.VK_DOWN:
             	bD = false;
 	            break;
-	            
-            case KeyEvent.VK_CONTROL:
-            	myTank.fire();
+	      	
+            case KeyEvent.VK_S:
+            	gm.save();
             	break;
+            case KeyEvent.VK_L:
+            	gm.load();
+            	break;	
 				
 				default:
 					break;
