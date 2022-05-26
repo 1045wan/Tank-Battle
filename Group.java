@@ -1,6 +1,5 @@
-package com.liuyonghong.tank;
+package cmo.lxr.tank;
 
 public enum Group {
-	GOOD,BAD
-
+	GOOD, BAD
 }
