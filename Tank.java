@@ -1,180 +1,197 @@
-package cmo.lxr.tank;
+package com.liuyonghong.tank;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.List;
+import java.awt.Rectangle;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
+import com.liuyonghong.tank.observer.TankFireEvent;
+import com.liuyonghong.tank.observer.TankFireObserver;
 
+public abstract class Tank extends GameObject{
+	private static final int SPEED =2;
+	public static int WIDTH = ResourceMgr.goodtankU.getWidth();
 
-
-
-
-
-
-
-
-public class Tank {
-
-	private static final int SPEED = 1;
-
-
-	public static int WIDTH =20;
-
-	public static int HEIGHT=20;
+	public static int HEIGHT = ResourceMgr.goodtankU.getHeight();
 	
-	private Random random = new Random();
-
+	public Rectangle rect = new Rectangle();
 	private int x,y;
 
-	private Dir dir = Dir.DOWN;
+	private Random random = new Random();
 
-	private boolean moving=true;
-	private tankFrame tf = null;
+	 int oldx, oldy;
 
+	 private Dir dir =Dir.DOWN;
+
+
+	private boolean moving = true;
+	TankFrame tf =null;
 	private boolean living = true;
-	private Group group = Group.BAD;
-	public Tank(int x, int y, Dir dir, Group group,tankFrame tf) {
+	public Group group = Group.BAD;
+	
+    
+	public Tank(int x, int y, Dir dir,Group group,TankFrame tf) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.dir = dir;
-		this.group = group;
-		this.tf=tf;
+		this.group=group;
+		this.tf = tf;
 		
-	}
-	public void fire() {
-		int bx=this.x+Tank.WIDTH/2-Bullet.WIDTH/2;
-		int by=this.y+Tank.HEIGHT/2-Bullet.HEIGHT/2;
-		tf.bullets.add( new Bullet(this.x ,this.y, this.dir,this.group,this.tf));
 		
-	}
+		rect.x = this.x;
+		rect.y = this.y;
+		rect.width= WIDTH;
+		rect.height = HEIGHT;
+	
+	}	
+		public void fire() {
+			int bX = this.x + Tank.WIDTH/2 - Bullet.WIDTH/2;
+			int bY = this.y + Tank.HEIGHT/2 - Bullet.HEIGHT/2;
 			
-	public Group getGroup() {
-		return group;
-	}
-	public void setGroup(Group group) {
-		this.group = group;
-	}
+			tf.bullets. add(new Bullet(bX, bY, this.dir, this.group, this.tf));
+			if(this.group == Group.GOOD) new Thread(()- >new Audio(" audio/tank_ fire . wav").play()).start();
+			}
+
+	
+	
+	
+	
+	
 	public Dir getDir() {
 		return dir;
 	}
 	
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public boolean isMoving() {
-		return moving;
-	}
 
+	
 	private void move() {
-		if(!moving) return ;
-		switch (dir)
-
-		{
-		case LEFT:
-			x -= SPEED;
-			break;
-		case UP:
-			y -= SPEED;
-			break;
-		case RIGHT:
-			x += SPEED;
-			break;
-		case DOWN:
-			y += SPEED;
-			break;
-		}
+		if(!moving) return;
 		
-		if(random.nextInt(10)>8) this.fire();
+		 switch(dir) {
+		 case LEFT:
+			 x -=SPEED;
+			 break;
+		 case UP:
+			 y -=SPEED;
+			 break;
+		 case RIGHT:
+			 x +=SPEED;
+			 break;
+		 case DOWN:
+			 y +=SPEED;
+			 break;
+		 }	
+		 
+		
+		 if(this.group == Group.BAD && random.nextInt(100)>95)
+			 this.fire();
+		 
+		 if(this.group == Group.BAD && random.nextInt(100)>95)
+			 randomDir();
+		 
+		 boundsCheck();
+		 //update react
+		 rect.x = this.x;
+		 rect.y = this.y;
+		 
+	}
+	
+	
+	private void boundsCheck() {
+		if (this.x <2)
+			x=2;
+		if (this.y <28)
+			y=28;
+		if (this.x >TankFrame.GAME_WIDTH -Tank.WIDTH -2)
+			x=TankFrame.GAME_WIDTH -Tank.WIDTH -2;
+		if (this.y >TankFrame.GAME_HEIGHT -Tank.HEIGHT -2)
+			y=TankFrame.GAME_HEIGHT -Tank.HEIGHT -2;
+		
+	}
+
+	private void randomDir() {
+		
+		this.dir = Dir.values()[random.nextInt(4)];
+		// TODO 自动生成的方法存根
+		
 	}
 
 	public void paint(Graphics g) {
-		if(!living) tf.tanks.remove(this);
-		switch (dir) {
-		case LEFT:		
-		try {
-			BufferedImage image =ImageIO.read(new File("D:\\新建文件夹 (2)\\tank\\src\\images\\tankL.gif"));
-			assertNotNull(image);
-			g.drawImage(image, x, y, tf);
-		} catch (IOException e) {
+		// TODO Auto-generated method stub
+	if(!living) GameModel.getInstanks.remove(this);
 		
-			e.printStackTrace();
-		}
-		break;
-		case UP:		
-			try {
-				BufferedImage image =ImageIO.read(new File("D:\\新建文件夹 (2)\\tank\\src\\images\\tankU.gif"));
-				assertNotNull(image);
-				g.drawImage(image, x, y, tf);
-			} catch (IOException e) {
-			
-				e.printStackTrace();
-			}
+	    switch (dir) {
+	    case LEFT:
+			g.drawImage(this.group == Group.GOOD? ResourceMgr.goodtankL:ResourceMgr.badtankL, x, y,null);
 			break;
-		case RIGHT:		
-			try {
-				BufferedImage image =ImageIO.read(new File("D:\\新建文件夹 (2)\\tank\\src\\images\\tankR.gif"));
-				assertNotNull(image);
-				g.drawImage(image, x, y, tf);
-			} catch (IOException e) {
-			
-				e.printStackTrace();
-			}
+	    case UP:
+			g.drawImage(this.group == Group.GOOD? ResourceMgr.goodtankU:ResourceMgr.badtankU, x, y,null);
 			break;
-		case DOWN:		
-			try {
-				BufferedImage image =ImageIO.read(new File("D:\\新建文件夹 (2)\\tank\\src\\images\\tankD.gif"));
-				assertNotNull(image);
-				g.drawImage(image, x, y, tf);
-			} catch (IOException e) {
-			
-				e.printStackTrace();
-			}
+	    case RIGHT:
+			g.drawImage(this.group == Group.GOOD? ResourceMgr.goodtankR:ResourceMgr.badtankR, x, y,null);
 			break;
-		}	
-					
-			
-					
-				
-				
-				
-		
-		
-		
-		move();
-		
-		
+	    case DOWN:
+			g.drawImage(this.group == Group.GOOD? ResourceMgr.goodtankD:ResourceMgr.badtankD, x, y,null);
+			break;
+	    
+	    }
+	    
+		 move();
+		 
 	}
 
+	private void eandomDir() {
+		this.dir = Dir.values()[random.nextInt(4)];
+	}
+	
 	public void setDir(Dir dir) {
 		this.dir = dir;
+	}
+	
+	public void setGroup(Group group) {
+		this.group = group;
 	}
 
 	public void setMoving(boolean moving) {
 		this.moving = moving;
 	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
+	
 	public void setY(int y) {
 		this.y = y;
 	}
-	public void die() {
-		this.living=false;
-		
+
+	public void stop() {
+		moving = false;
 	}
-}
+	
+	public int getWidth() {
+		return WIDTH;
+	}
+	
+	public int getHeight() {
+		return HEIGHT;
+	}
+
+	protected abstract Group getGroup();
+	protected abstract void die();
+	public int getX() {
+		// TODO 自动生成的方法存根
+		return 0;
+	}
+	public int getY() {
+		// TODO 自动生成的方法存根
+		return 0;
+	}}
+	
+	//private transient List<TankFireObserver> fireObservers = Arrays.asList(new);
+		//	private void handleFireKey() {
+		//TankFireEvent event = new TankFireEvent();
+		
+		//for(TankFireObserver o : fireObservers) {
+		//	TankFireEvent event;
+		//	o.actionOnFire(event);
+		//}
+	
+
+

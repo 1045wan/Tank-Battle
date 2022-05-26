@@ -1,58 +1,41 @@
-package cmo.lxr.tank;
+package com.liuyonghong.tank;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
+import com.liuyonghong.tank.abstractfactory.BaseExplode;
 
-public class Explode {
-private static final int SPEED = 10;
-
-public static int WIDTH = 10;
-
-public static int HEIGHT=10;
-
+public class Explode extends BaseExplode{
+	public static int WIDTH = ResourceMgr.explodes[0].getWidth(); 
+	public static int HEIGHT = ResourceMgr.explodes[0].getHeight(); 
 
 	
 	private int x, y;
 
-
-	private boolean living = true;
-	tankFrame tf=null;
+	
+	private boolean living =true;
+	TankFrame tf=null;
+	
 	private int step = 0;
 	
-	public Explode (int x,int y,tankFrame tf) 
-	{
-		
+	public Explode(int x,int y,TankFrame tf) {
 		this.x = x;
 		this.y = y;
-		
-		this.tf=tf;
-		}
+		this.tf = tf;
+	 
+ new Thread(()->new Audio("audio/explode.wav").play()).start();
+	}
 	
+	
+    @Override
 	public void paint(Graphics g) {
-		try {
-			BufferedImage image =ImageIO.read(new File("D:\\新建文件夹 (2)\\tank\\src\\images\\e10.gif"));
-			assertNotNull(image);
-			g.drawImage(image, x, y, tf);
-		} catch (IOException e) {
 		
-			e.printStackTrace();
-		}
-		
-			
-		
-		
-	}
+	g.drawImage(ResourceMgr.explodes[step++],x,y,null);
 	
+	if(step>=ResourceMgr.explodes.length)
+		tf.exp1odes.remove(this);
 	
-		
-	}
+    }
+	
+}
 
 
